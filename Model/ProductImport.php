@@ -2,12 +2,30 @@
 
 namespace Ds\ProductImport\Model;
 
+
+use Magento\Framework\File\Csv;
+
 /**
  * Class ProductImport
  * @package Ds\ProductImport\Model
  */
 class ProductImport
 {
+    /**
+     * @var Csv
+     */
+    protected $_csv;
+
+    /**
+     * ProductImport constructor.
+     * @param Csv $csv
+     */
+    public function __construct(
+        Csv $csv
+    )
+    {
+        $this->_csv = $csv;
+    }
 
     public function createProductSimple($file)
     {
@@ -72,6 +90,16 @@ class ProductImport
             {
                 die('Something failed for product import ' . $e->getMessage() . PHP_EOL);
                 print_r($e);
+            }
+        }
+    }
+
+    protected function _processorCsv($file)
+    {
+        $csvData = $this->_csv->getData($file);
+        foreach ($csvData as $row => $data) {
+            if ($row > 0){
+
             }
         }
     }
