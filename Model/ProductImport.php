@@ -2,8 +2,9 @@
 
 namespace Ds\ProductImport\Model;
 
-
 use Magento\Framework\File\Csv;
+use Magento\Framework\App\State;
+use Magento\Setup\Exception;
 
 /**
  * Class ProductImport
@@ -17,43 +18,36 @@ class ProductImport
     protected $_csv;
 
     /**
+     * @var State
+     */
+    protected $_state;
+
+    /**
      * ProductImport constructor.
      * @param Csv $csv
      */
     public function __construct(
-        Csv $csv
+        Csv $csv,
+        State $state
     )
     {
-        $this->_csv = $csv;
+        $this->_csv   = $csv;
+        $this->_state = $state;
     }
 
-    public function createProductSimple()
+    public function createProductSimple($file)
     {
-        $a = $this->_processorCsv();
+        $importProducts = $this->_processorCsv($file);
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
 
         $filesystem = $objectManager->create('Magento\Framework\Filesystem');
-        $mediaDirectory = $filesystem->getDirectoryWrite(\Magento\Framework\App\Filesystem\DirectoryList::MEDIA);
-        $mediaPath = $mediaDirectory->getAbsolutePath();
+        $this->_state->setAreaCode(\Magento\Framework\App\Area::AREA_ADMINHTML);
 
-        $importProducts = [
-            [
-                'name'              => 'Product L',
-                'sku'               => 'product_l_blue',
-                'weight'            => '23',
-                'tax_class_id'      => 0,
-                'price'             => 233,
-                'meta_title'        => 'title',
-                'meta_keyword'      => 'l,blue',
-                'meta_description'  => 'meta description',
-                'description'       => 'description'
-            ]
-        ];
-
-        foreach( $importProducts as $importProduct ) {
+        foreach($importProducts as $importProduct) {
 
             try {
                 $product = $objectManager->create('\Magento\Catalog\Model\Product');
+                $product->setData($importProduct);
                 $product->setWebsiteIds(array(1));
                 $product->setAttributeSetId(4);
                 $product->setTypeId(\Magento\Catalog\Model\Product\Type::TYPE_SIMPLE);
@@ -68,7 +62,6 @@ class ProductImport
                 $product->setPrice($importProduct['price']) ;
                 $product->setCost(1);
                 $product->setMetaTitle($importProduct['meta_title']);
-                $product->setMetaKeyword($importProduct['meta_keyword']);
                 $product->setMetaDescription($importProduct['meta_description']);
                 $product->setDescription($importProduct['description']);
 
@@ -83,12 +76,12 @@ class ProductImport
                     )
                 );
 
+                try {
+                    $product->save();
+                } catch (Exception $e) {
 
-                $product->save();
-                echo "Upload simple product id :: ".$product->getId()."\n";
-            }
-            catch(Exception $e)
-            {
+                }
+            } catch(Exception $e) {
                 die('Something failed for product import ' . $e->getMessage() . PHP_EOL);
                 print_r($e);
             }
@@ -99,14 +92,24 @@ class ProductImport
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $filesystem = $objectManager->create(\Magento\Framework\Filesystem::class);
-        $path = $filesystem->getDirectoryRead(\Magento\Framework\App\Filesystem\DirectoryList::PUB)->getAbsolutePath() . 'ds-product-import/products.csv';
-        die($path);
+        $file = $filesystem->getDirectoryRead(\Magento\Framework\App\Filesystem\DirectoryList::PUB)->getAbsolutePath() . 'ds-product-import/products.csv';
 
-//        $csvData = $this->_csv->getData($file);
-//        foreach ($csvData as $row => $data) {
-//            if ($row > 0){
-//
-//            }
-//        }
+        $csvData = $this->_csv->getData($file);
+        $items = [];
+        $k = 0;
+        foreach ($csvData as $row => $data) {
+            if ($row === 0){
+                $firstData = array_flip($data);
+            } elseif(isset($firstData) && count($firstData) > 0) {
+                $i = 0;
+                foreach ($firstData as $key => $item) {
+                    $items[$k][$key] = $data[$i];
+                    $i++;
+                }
+                $k++;
+            }
+        }
+
+        return $items;
     }
 }
