@@ -53,7 +53,7 @@ class DsProductCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $fileName = $input->getArgument('name');
-        $path = $this->getImportPath() . 'ds-product-import' . DS . $fileName;
+        $path = $this->getImportPath() . 'ds-product-import' . DIRECTORY_SEPARATOR . $fileName;
         $this->_productImport->createProductSimple($path);
         $output->writeln($path);
     }
