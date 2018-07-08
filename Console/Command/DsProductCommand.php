@@ -30,9 +30,9 @@ class DsProductCommand extends Command
      * @param \Ds\ProductImport\Model\ProductImport $productImport
      */
     public function __construct(
-        $name,
         \Magento\Framework\Filesystem $filesystem,
-        \Ds\ProductImport\Model\ProductImport $productImport
+        \Ds\ProductImport\Model\ProductImport $productImport,
+        $name = null
     )
     {
         $this->_productImport       = $productImport;
@@ -44,14 +44,17 @@ class DsProductCommand extends Command
 
     protected function configure()
     {
-        $this->setName('ds:product_import')->setDescription('Import Product');
+        $this->setName('ds:product_import')
+              ->setDescription('Import Product')
+              ->addArgument('name', InputArgument::REQUIRED, 'Name import file.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $name = $input->getArgument('name');
         $path = $this->getImportPath() . DS . 'ds-product-import';
         $this->_productImport->createProductSimple($path);
-        $output->writeln($path);
+        $output->writeln($name);
     }
 
     /**
