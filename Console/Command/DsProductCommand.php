@@ -17,7 +17,7 @@ class DsProductCommand extends Command
     /**
      * @var \Magento\Framework\Filesystem
      */
-    protected $_dsProductImportPath;
+    protected $_filesystem;
 
     /**
      * @var \Ds\ProductImport\Model\ProductImport
@@ -30,14 +30,14 @@ class DsProductCommand extends Command
      * @param \Ds\ProductImport\Model\ProductImport $productImport
      */
     public function __construct(
-        \Magento\Framework\Filesystem $dsProductImportPath,
-        \Ds\ProductImport\Model\ProductImport $productImport,
-        $name
+        $name,
+        \Magento\Framework\Filesystem $filesystem,
+        \Ds\ProductImport\Model\ProductImport $productImport
     )
     {
         $this->_productImport       = $productImport;
-        $this->_dsProductImportPath = $dsProductImportPath;
-       
+        $this->_filesystem = $filesystem;
+
         parent::__construct($name);
     }
 
@@ -59,6 +59,6 @@ class DsProductCommand extends Command
      */
     protected function getImportPath()
     {
-        return $this->_dsProductImportPath->getDirectoryRead(DirectoryList::PUB)->getAbsolutePath();
+        return $this->_filesystem->getDirectoryRead(DirectoryList::PUB)->getAbsolutePath();
     }
 }
