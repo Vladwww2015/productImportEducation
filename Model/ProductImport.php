@@ -2,9 +2,14 @@
 
 namespace Ds\ProductImport\Model;
 
+/**
+ * Class ProductImport
+ * @package Ds\ProductImport\Model
+ */
 class ProductImport
 {
-    public function createProducts()
+
+    public function createProductSimple($file)
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
 
@@ -12,31 +17,41 @@ class ProductImport
         $mediaDirectory = $filesystem->getDirectoryWrite(\Magento\Framework\App\Filesystem\DirectoryList::MEDIA);
         $mediaPath = $mediaDirectory->getAbsolutePath();
 
+        $importProducts = [
+            [
+                'name'              => 'Product L',
+                'sku'               => 'product_l_blue',
+                'weight'            => '23',
+                'tax_class_id'      => 0,
+                'price'             => 233,
+                'meta_title'        => 'title',
+                'meta_keyword'      => 'l,blue',
+                'meta_description'  => 'meta description',
+                'description'       => 'description'
+            ]
+        ];
+
         foreach( $importProducts as $importProduct ) {
 
             try {
-
                 $product = $objectManager->create('\Magento\Catalog\Model\Product');
                 $product->setWebsiteIds(array(1));
                 $product->setAttributeSetId(4);
-                $product->setTypeId('simple');
+                $product->setTypeId(\Magento\Catalog\Model\Product\Type::TYPE_SIMPLE);
                 $product->setCreatedAt(strtotime('now'));
-                $product->setName($importProduct[1]);
-                $product->setSku($importProduct[3]);
-                $product->setWeight($importProduct[16]);
+                $product->setName($importProduct['name']);
+                $product->setSku($importProduct['sku']);
+                $product->setWeight($importProduct['weight']);
                 $product->setStatus(1);
-                $category_id= array(30,24);
-                $product->setCategoryIds($category_id);
                 $product->setTaxClassId(0); // (0 - none, 1 - default, 2 - taxable, 4 - shipping)
                 $product->setVisibility(4); // catalog and search visibility
                 $product->setColor(24);
-                $product->setPrice($importProduct[11]) ;
+                $product->setPrice($importProduct['price']) ;
                 $product->setCost(1);
-                $product->setMetaTitle($importProduct[1]);
-                $product->setMetaKeyword($importProduct[26]);
-                $product->setMetaDescription($importProduct[28]);
-                $product->setDescription($importProduct[27]);
-                $product->setShortDescription($importProduct[27]);
+                $product->setMetaTitle($importProduct['meta_title']);
+                $product->setMetaKeyword($importProduct['meta_keyword']);
+                $product->setMetaDescription($importProduct['meta_description']);
+                $product->setDescription($importProduct['description']);
 
                 $product->setStockData(
                     array(
@@ -45,7 +60,7 @@ class ProductImport
                         'min_sale_qty' => 1, // Shopping Cart Minimum Qty Allowed
                         'max_sale_qty' => 2, // Shopping Cart Maximum Qty Allowed
                         'is_in_stock' => 1, // Stock Availability of product
-                        'qty' => (int)$importProduct[6]
+                        'qty' => (int)10
                     )
                 );
 
@@ -55,7 +70,7 @@ class ProductImport
             }
             catch(Exception $e)
             {
-                echo 'Something failed for product import ' . $importProduct[1] . PHP_EOL;
+                die('Something failed for product import ' . $e->getMessage() . PHP_EOL);
                 print_r($e);
             }
         }

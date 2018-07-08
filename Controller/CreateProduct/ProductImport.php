@@ -41,6 +41,6 @@ class ProductImport extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
-        $this->_productImport->createProducts();
+        $this->_productImport->createProductSimple();
     }
 }
