@@ -1,33 +1,43 @@
 <?php
 
+
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Command\Command;
+
 class DsProductImport extends Command
 {
 
-    protected $ds_product_import_path;
-    protected $productImport;
+    protected $_dsProductImportPath;
+    protected $_productImport;
 
     public function __construct(
-        \Magento\Framework\Filesystem $ds_product_import_path,
-        \Ds\ProductImport\Model\ProductImport $productImport
+        \Magento\Framework\Filesystem $dsProductImportPath,
+        \Ds\ProductImport\Model\ProductImport $productImport,
+        $name
     )
     {
-        $this->ds_product_import_path = $ds_product_import_path;
-        $this->productImport = $productImport;
+        $this->_dsProductImportPath = $dsProductImportPath;
+        $this->_productImport = $productImport;
+        parent::__construct($name);
     }
 
     protected function configure()
     {
-        $this->setName('ds:product_import')->setDescription('Import Product');
+        $this->setName('ds:product_import')
+              ->setDescription('Import Product')
+              ->addArgument('path', InputArgument::REQUIRED, 'Path to import file.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->productImport->createProductSimple();
-        $output->writeln('Import Product');
+        $path = $input->getArgument('path');
+
+//        $this->productImport->createProductSimple();
+        $output->writeln($path);
     }
 
     protected function getImportPath()
     {
-        return $this->ds_product_import_path->getDirectoryRead(DirectoryList::PUB)->getAbsolutePath();
+        return $this->_dsProductImportPath->getDirectoryRead(DirectoryList::PUB)->getAbsolutePath();
     }
 }
