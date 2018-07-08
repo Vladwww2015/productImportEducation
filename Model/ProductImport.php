@@ -27,8 +27,9 @@ class ProductImport
         $this->_csv = $csv;
     }
 
-    public function createProductSimple($file)
+    public function createProductSimple()
     {
+        $a = $this->_processorCsv();
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
 
         $filesystem = $objectManager->create('Magento\Framework\Filesystem');
@@ -94,13 +95,18 @@ class ProductImport
         }
     }
 
-    protected function _processorCsv($file)
+    protected function _processorCsv($file = null)
     {
-        $csvData = $this->_csv->getData($file);
-        foreach ($csvData as $row => $data) {
-            if ($row > 0){
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $filesystem = $objectManager->create(\Magento\Framework\Filesystem::class);
+        $path = $filesystem->getDirectoryRead(\Magento\Framework\App\Filesystem\DirectoryList::PUB)->getAbsolutePath() . 'ds-product-import/products.csv';
+        die($path);
 
-            }
-        }
+//        $csvData = $this->_csv->getData($file);
+//        foreach ($csvData as $row => $data) {
+//            if ($row > 0){
+//
+//            }
+//        }
     }
 }

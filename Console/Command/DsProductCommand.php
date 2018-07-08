@@ -44,17 +44,14 @@ class DsProductCommand extends Command
 
     protected function configure()
     {
-        $this->setName('ds:product_import')
-              ->setDescription('Import Product')
-              ->addArgument('name', InputArgument::REQUIRED, 'Name import file.');
+        $this->setName('ds:product_import')->setDescription('Import Product');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $name = $input->getArgument('name');
-        $path = $this->getImportPath() . DS . 'ds-product-import';
+        $path = $this->getImportPath() . 'ds-product-import';
         $this->_productImport->createProductSimple($path);
-        $output->writeln($name);
+        $output->writeln($path);
     }
 
     /**
