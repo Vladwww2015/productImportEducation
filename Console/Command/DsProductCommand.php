@@ -4,6 +4,7 @@ namespace Ds\ProductImport\Console\Command;
 
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -44,12 +45,15 @@ class DsProductCommand extends Command
 
     protected function configure()
     {
-        $this->setName('ds:product_import')->setDescription('Import Product');
+        $this->setName('ds:product_import')
+              ->setDescription('Import Product')
+              ->addArgument('name', InputArgument::REQUIRED, 'Import file name.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $path = $this->getImportPath() . 'ds-product-import';
+        $fileName = $input->getArgument('name');
+        $path = $this->getImportPath() . 'ds-product-import' . DS . $fileName;
         $this->_productImport->createProductSimple($path);
         $output->writeln($path);
     }
