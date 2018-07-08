@@ -51,19 +51,11 @@ class ProductImport
                 $product->setWebsiteIds(array(1));
                 $product->setAttributeSetId(4);
                 $product->setTypeId(\Magento\Catalog\Model\Product\Type::TYPE_SIMPLE);
-                $product->setCreatedAt(strtotime('now'));
-                $product->setName($importProduct['name']);
-                $product->setSku($importProduct['sku']);
-                $product->setWeight($importProduct['weight']);
                 $product->setStatus(1);
                 $product->setTaxClassId(0); // (0 - none, 1 - default, 2 - taxable, 4 - shipping)
                 $product->setVisibility(4); // catalog and search visibility
                 $product->setColor(24);
-                $product->setPrice($importProduct['price']) ;
                 $product->setCost(1);
-                $product->setMetaTitle($importProduct['meta_title']);
-                $product->setMetaDescription($importProduct['meta_description']);
-                $product->setDescription($importProduct['description']);
 
                 $product->setStockData(
                     array(
